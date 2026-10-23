@@ -1,0 +1,235 @@
+!
+version 15.0
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+service password-encryption
+!
+hostname SW1
+!
+enable secret 5 $1$mERr$dV7WaQT6Uhr.AIPwIzMxI.
+!
+!
+!
+ip ssh version 2
+no ip domain-lookup
+ip domain-name lab.local
+!
+username admin secret 5 $1$mERr$/EMhF55R74DNQlB5U0q9p.
+!
+!
+!
+spanning-tree mode rapid-pvst
+spanning-tree portfast default
+spanning-tree portfast bpduguard default
+spanning-tree extend system-id
+spanning-tree vlan 10,20,30,50,99 priority 4096
+!
+interface Port-channel1
+ description PO1-A-SW2
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 10,20,30,50,99
+ switchport mode trunk
+!
+interface FastEthernet0/1
+ description SRV-INTERNO
+ switchport access vlan 30
+ switchport mode access
+ switchport port-security
+ switchport port-security mac-address sticky 
+ switchport port-security mac-address sticky 00E0.B0DC.458A
+!
+interface FastEthernet0/2
+ description PC-VENTAS1
+ switchport access vlan 10
+ switchport mode access
+ switchport port-security
+ switchport port-security mac-address sticky 
+ switchport port-security mac-address sticky 0001.966A.873C
+!
+interface FastEthernet0/3
+ description SIN-USO
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/4
+ description SIN-USO
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/5
+ description SIN-USO
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/6
+ description SIN-USO
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/7
+ description SIN-USO
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/8
+ description SIN-USO
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/9
+ description SIN-USO
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/10
+ description SIN-USO
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/11
+ description SIN-USO
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/12
+ description SIN-USO
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/13
+ description SIN-USO
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/14
+ description SIN-USO
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/15
+ description SIN-USO
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/16
+ description SIN-USO
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/17
+ description SIN-USO
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/18
+ description SIN-USO
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/19
+ description SIN-USO
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/20
+ description SIN-USO
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/21
+ description SIN-USO
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/22
+ description SIN-USO
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/23
+ description PO1-A-SW2
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 10,20,30,50,99
+ switchport mode trunk
+ duplex full
+ speed 100
+ channel-protocol lacp
+ channel-group 1 mode active
+!
+interface FastEthernet0/24
+ description PO1-A-SW2
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 10,20,30,50,99
+ switchport mode trunk
+ duplex full
+ speed 100
+ channel-protocol lacp
+ channel-group 1 mode active
+!
+interface GigabitEthernet0/1
+ description TRUNK-A-R1
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 10,20,30,50,99
+ switchport mode trunk
+!
+interface GigabitEthernet0/2
+ description SIN-USO
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan99
+ description GESTION
+ ip address 192.168.99.2 255.255.255.0
+!
+ip default-gateway 192.168.99.1
+!
+banner motd #Acceso restringido solo a personal autorizado#
+!
+!
+!
+ip access-list standard SSH-ADMIN
+ permit 192.168.20.0 0.0.0.255
+ permit 192.168.99.0 0.0.0.255
+line con 0
+ logging synchronous
+ login local
+ exec-timeout 5 0
+!
+line vty 0 4
+ access-class SSH-ADMIN in
+ exec-timeout 5 0
+ login local
+ transport input ssh
+line vty 5 15
+ login
+!
+!
+!
+!
+end
+
