@@ -1,0 +1,167 @@
+!
+version 15.1
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+service password-encryption
+!
+hostname R1
+!
+!
+!
+enable secret 5 $1$mERr$dV7WaQT6Uhr.AIPwIzMxI.
+!
+!
+ip dhcp excluded-address 192.168.10.1 192.168.10.20
+ip dhcp excluded-address 192.168.20.1 192.168.20.20
+ip dhcp excluded-address 192.168.50.1 192.168.50.20
+!
+ip dhcp pool VENTAS
+ network 192.168.10.0 255.255.255.0
+ default-router 192.168.10.1
+ dns-server 8.8.8.8
+ip dhcp pool IT
+ network 192.168.20.0 255.255.255.0
+ default-router 192.168.20.1
+ dns-server 8.8.8.8
+ip dhcp pool INVITADOS
+ network 192.168.50.0 255.255.255.0
+ default-router 192.168.50.1
+ dns-server 8.8.8.8
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+!
+!
+username admin privilege 15 secret 5 $1$mERr$/EMhF55R74DNQlB5U0q9p.
+!
+!
+license udi pid CISCO2911/K9 sn FTX15243OOW-
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip ssh version 2
+no ip domain-lookup
+ip domain-name lab.local
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface GigabitEthernet0/0
+ description TRUNK-A-SW1
+ no ip address
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/0.10
+ description VENTAS
+ encapsulation dot1Q 10
+ ip address 192.168.10.1 255.255.255.0
+ ip nat inside
+ ip access-group VENTAS-IN in
+!
+interface GigabitEthernet0/0.20
+ description IT
+ encapsulation dot1Q 20
+ ip address 192.168.20.1 255.255.255.0
+ ip nat inside
+!
+interface GigabitEthernet0/0.30
+ description SERVIDORES
+ encapsulation dot1Q 30
+ ip address 192.168.30.1 255.255.255.0
+ ip nat inside
+!
+interface GigabitEthernet0/0.50
+ description INVITADOS
+ encapsulation dot1Q 50
+ ip address 192.168.50.1 255.255.255.0
+ ip nat inside
+ ip access-group INVITADOS-IN in
+!
+interface GigabitEthernet0/0.99
+ description GESTION
+ encapsulation dot1Q 99
+ ip address 192.168.99.1 255.255.255.0
+ ip nat inside
+!
+interface GigabitEthernet0/1
+ description WAN-A-ISP
+ ip address 203.0.113.2 255.255.255.252
+ ip nat outside
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/2
+ no ip address
+ duplex auto
+ speed auto
+!
+interface Vlan1
+ no ip address
+!
+ip nat inside source list NAT-INTERNO interface GigabitEthernet0/1 overload
+ip classless
+ip route 0.0.0.0 0.0.0.0 203.0.113.1 
+!
+ip flow-export version 9
+!
+!
+ip access-list standard NAT-INTERNO
+ permit 192.168.0.0 0.0.255.255
+ip access-list extended VENTAS-IN
+ remark Respuestas hacia IT (soporte)
+ permit icmp 192.168.10.0 0.0.0.255 192.168.20.0 0.0.0.255 echo-reply
+ permit tcp 192.168.10.0 0.0.0.255 192.168.20.0 0.0.0.255 established
+ remark Ventas no accede a IT, Gestion ni Invitados
+ deny ip 192.168.10.0 0.0.0.255 192.168.20.0 0.0.0.255
+ deny ip 192.168.10.0 0.0.0.255 192.168.99.0 0.0.0.255
+ deny ip 192.168.10.0 0.0.0.255 192.168.50.0 0.0.0.255
+ remark Resto permitido
+ permit ip any any
+ip access-list extended INVITADOS-IN
+ remark Invitados sin acceso a redes internas
+ deny ip 192.168.50.0 0.0.0.255 192.168.0.0 0.0.255.255
+ remark Solo Internet
+ permit ip any any
+ip access-list standard SSH-ADMIN
+ permit 192.168.20.0 0.0.0.255
+ permit 192.168.99.0 0.0.0.255
+!
+banner motd #Acceso restringido solo a personal autorizado#
+!
+!
+!
+!
+line con 0
+ exec-timeout 5 0
+ logging synchronous
+ login local
+!
+line aux 0
+!
+line vty 0 4
+ access-class SSH-ADMIN in
+ exec-timeout 5 0
+ login local
+ transport input ssh
+!
+!
+!
+end
+
